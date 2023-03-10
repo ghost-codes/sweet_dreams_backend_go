@@ -1,14 +1,14 @@
 migrateup:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams?sslmode=disable" -verbose up
+	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams_go?sslmode=disable" -verbose up
 
 migrateup1:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams?sslmode=disable" -verbose up 1
+	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams_go?sslmode=disable" -verbose up 1
 
 migratedown:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams?sslmode=disable" -verbose down
-	
+	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams_go?sslmode=disable" -verbose down
+
 migratedown1:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams?sslmode=disable" -verbose down 1
+	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/sweet_dreams_go?sslmode=disable" -verbose down 1
 
 sqlc:
 	sqlc generate

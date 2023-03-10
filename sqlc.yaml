@@ -1,0 +1,22 @@
+version: "1"
+project:
+  id: "sweet_dreams"
+
+# sql:
+#   - engine: "postgres"
+#     queries: "query.sql"
+#     schema: "schema.sql"
+#     gen:
+#       go:
+
+packages:
+  - name: "db"
+    path: "./db/sqlc"
+    queries: "./db/query/"
+    schema: "./db/migrations/"
+    engine: "postgresql"
+    emit_json_tags: true
+    emit_prepared_queries: false
+    emit_interface: false
+    emit_exact_table_names: false
+    emit_empty_slices: true
