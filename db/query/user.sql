@@ -16,4 +16,4 @@ RETURNING *;
 
 -- name: GetUser :one
 SELECT * FROM users
-WHERE username = $1 LIMIT 1;
+WHERE username = $1 OR email =$1 LIMIT 1;

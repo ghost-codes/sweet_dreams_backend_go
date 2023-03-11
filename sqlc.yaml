@@ -20,3 +20,53 @@ packages:
     emit_interface: false
     emit_exact_table_names: false
     emit_empty_slices: true
+
+overrides:
+  - db_type: "pg_catalog.timestamp"
+    go_type:
+      import: "time"
+      type: "Time"
+      pointer: true
+    nullable: true
+  - db_type: "timestamptz"
+    go_type:
+      import: "time"
+      type: "Time"
+      pointer: true
+    nullable: true
+
+  - db_type: "pg_catalog.int2"
+    go_type:
+      type: "int16"
+      pointer: true
+    nullable: true
+  - db_type: "pg_catalog.int4"
+    go_type:
+      type: "int"
+      pointer: true
+    nullable: true
+  - db_type: "pg_catalog.int8"
+    go_type:
+      type: "int64"
+      pointer: true
+    nullable: true
+  - db_type: "pg_catalog.bool"
+    go_type:
+      type: "bool"
+      pointer: true
+    nullable: true
+  - db_type: "pg_catalog.float4"
+    go_type:
+      type: "float32"
+      pointer: true
+    nullable: true
+  - db_type: "pg_catalog.float8"
+    go_type:
+      type: "float64"
+      pointer: true
+    nullable: true      
+  - db_type: "pg_catalog.varchar"
+    go_type:
+      type: "string"
+      pointer: true
+    nullable: true      

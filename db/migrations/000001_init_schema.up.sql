@@ -8,7 +8,7 @@ CREATE TABLE "users" (
   "avatar_url" varchar,
   "contact" varchar,
   "security_key" varchar NOT NULL,
-  "password_changed_at" timestamptz NOT NULL,
+  "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "verified_at" timestamptz,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );

@@ -13,4 +13,7 @@ migratedown1:
 sqlc:
 	sqlc generate
 
-.PHONY: sqlc migrateup migrateup1 migratedown migratedown1
+server:
+	go run main.go
+
+.PHONY: sqlc migrateup migrateup1 migratedown migratedown1 server

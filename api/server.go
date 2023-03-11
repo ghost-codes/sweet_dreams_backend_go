@@ -19,6 +19,13 @@ type Server struct {
 func NewServer(store db.Store, config util.Config) (*Server, error) {
 	server := &Server{store: store, config: config}
 
+	tokenMaker, err := token.NewPasetoMaker(config.SecretKey)
+
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create token maker: %v", err)
+	}
+
+	server.tokenMaker = tokenMaker
 	server.setupRouter()
 
 	return server, nil
@@ -26,6 +33,9 @@ func NewServer(store db.Store, config util.Config) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+
+	router.POST("/users/sign_up", server.createUserWithEmailPassword)
+	router.POST("/users/login", server.loginWithEmailPassword)
 	server.router = router
 }
 
@@ -38,4 +48,8 @@ func (server *Server) Start(addr *string) {
 		fmt.Println("Server started\n Listening on:", addr)
 	}
 	server.router.Run()
+}
+
+func errorResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
 }

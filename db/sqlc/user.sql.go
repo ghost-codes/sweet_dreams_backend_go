@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createuser = `-- name: Createuser :one
@@ -27,14 +26,14 @@ RETURNING id, username, first_name, last_name, email, hashed_password, avatar_ur
 `
 
 type CreateuserParams struct {
-	Username       string         `json:"username"`
-	FirstName      string         `json:"first_name"`
-	LastName       string         `json:"last_name"`
-	Email          string         `json:"email"`
-	HashedPassword string         `json:"hashed_password"`
-	AvatarUrl      sql.NullString `json:"avatar_url"`
-	Contact        sql.NullString `json:"contact"`
-	SecurityKey    string         `json:"security_key"`
+	Username       string  `json:"username"`
+	FirstName      string  `json:"first_name"`
+	LastName       string  `json:"last_name"`
+	Email          string  `json:"email"`
+	HashedPassword string  `json:"hashed_password"`
+	AvatarUrl      *string `json:"avatar_url"`
+	Contact        *string `json:"contact"`
+	SecurityKey    string  `json:"security_key"`
 }
 
 func (q *Queries) Createuser(ctx context.Context, arg CreateuserParams) (User, error) {
@@ -68,7 +67,7 @@ func (q *Queries) Createuser(ctx context.Context, arg CreateuserParams) (User, e
 
 const getUser = `-- name: GetUser :one
 SELECT id, username, first_name, last_name, email, hashed_password, avatar_url, contact, security_key, password_changed_at, verified_at, created_at FROM users
-WHERE username = $1 LIMIT 1
+WHERE username = $1 OR email =$1 LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
