@@ -4,13 +4,16 @@ CREATE TABLE "users" (
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
   "email" varchar NOT NULL,
-  "hashed_password" varchar NOT NULL,
+  "hashed_password" varchar,
   "avatar_url" varchar,
   "contact" varchar,
   "security_key" varchar NOT NULL,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "verified_at" timestamptz,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "twitter_social" boolean NOT NULL DEFAULT FALSE,
+  "google_social" boolean NOT NULL DEFAULT FALSE,
+  "apple_social" boolean NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE "requests" (
@@ -64,3 +67,4 @@ ALTER TABLE "approvals" ADD FOREIGN KEY ("request_id") REFERENCES "requests" ("i
 ALTER TABLE "approvals" ADD FOREIGN KEY ("assigned_nurse") REFERENCES "nurses" ("id");
 
 ALTER TABLE "approvals" ADD FOREIGN KEY ("approved_by") REFERENCES "admins" ("id");
+

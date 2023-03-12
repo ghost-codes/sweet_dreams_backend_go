@@ -55,11 +55,14 @@ type User struct {
 	FirstName         string     `json:"first_name"`
 	LastName          string     `json:"last_name"`
 	Email             string     `json:"email"`
-	HashedPassword    string     `json:"hashed_password"`
+	HashedPassword    *string    `json:"hashed_password"`
 	AvatarUrl         *string    `json:"avatar_url"`
 	Contact           *string    `json:"contact"`
 	SecurityKey       string     `json:"security_key"`
 	PasswordChangedAt time.Time  `json:"password_changed_at"`
 	VerifiedAt        *time.Time `json:"verified_at"`
 	CreatedAt         time.Time  `json:"created_at"`
+	TwitterSocial     bool       `json:"twitter_social"`
+	GoogleSocial      bool       `json:"google_social"`
+	AppleSocial       bool       `json:"apple_social"`
 }

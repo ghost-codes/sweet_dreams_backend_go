@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
+	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/token"
@@ -14,6 +16,7 @@ type Server struct {
 	config     util.Config
 	tokenMaker token.Maker
 	router     *gin.Engine
+	firebase   *firebase.App
 }
 
 func NewServer(store db.Store, config util.Config) (*Server, error) {
@@ -26,6 +29,12 @@ func NewServer(store db.Store, config util.Config) (*Server, error) {
 	}
 
 	server.tokenMaker = tokenMaker
+	app, err := util.InitializeFirebaseApp(context.Background(), nil)
+
+	if err != nil {
+		return nil, err
+	}
+	server.firebase = app
 	server.setupRouter()
 
 	return server, nil
