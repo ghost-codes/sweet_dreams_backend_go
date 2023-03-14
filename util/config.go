@@ -18,6 +18,9 @@ type Config struct {
 	DBUser               string        `mapstructure:"DB_USER"`
 	DBPassword           string        `mapstructure:"DB_PASSWORD"`
 	DBName               string        `mapstructure:"DB_NAME"`
+	EmailSenderAddress   string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
+	EmailSenderPassword  string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
+	EmailSenderName      string        `mapstructure:"EMAIL_SENDER_NAME"`
 
 	// DBSource            string        `mapstructure:"DB_SOURCE"`
 }
