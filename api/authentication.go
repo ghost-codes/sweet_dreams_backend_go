@@ -96,6 +96,8 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 		return
 	}
 
+	//TODO: send verification email to client using redis
+
 	res := newUserResponse(user)
 
 	accessToken, _, err := server.tokenMaker.CreateToken(req.Username, user.SecurityKey, server.config.AccessTokenDuration)
