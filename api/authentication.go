@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/util"
+	"github.com/gost-codes/sweet_dreams/worker"
 	"github.com/lib/pq"
 )
 
@@ -82,6 +83,7 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 		SecurityKey:    uuid.NewString(),
 	}
 
+	//-------------------> TODO: convert to TX
 	user, err := server.store.Createuser(ctx, args)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -97,7 +99,14 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 	}
 
 	//TODO: send verification email to client using redis
+	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username})
 
+	if err != nil {
+		err = fmt.Errorf("failed to distribute send verified email task: %w", err)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	//------------------>
 	res := newUserResponse(user)
 
 	accessToken, _, err := server.tokenMaker.CreateToken(req.Username, user.SecurityKey, server.config.AccessTokenDuration)

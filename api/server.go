@@ -9,17 +9,19 @@ import (
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/token"
 	"github.com/gost-codes/sweet_dreams/util"
+	"github.com/gost-codes/sweet_dreams/worker"
 )
 
 type Server struct {
-	store      db.Store
-	config     util.Config
-	tokenMaker token.Maker
-	router     *gin.Engine
-	firebase   *firebase.App
+	store           db.Store
+	config          util.Config
+	tokenMaker      token.Maker
+	router          *gin.Engine
+	firebase        *firebase.App
+	taskDistributor worker.TaskDistributor
 }
 
-func NewServer(store db.Store, config util.Config) (*Server, error) {
+func NewServer(store db.Store, config util.Config, distributor worker.TaskDistributor) (*Server, error) {
 	server := &Server{store: store, config: config}
 
 	tokenMaker, err := token.NewPasetoMaker(config.SecretKey)
@@ -30,6 +32,7 @@ func NewServer(store db.Store, config util.Config) (*Server, error) {
 
 	server.tokenMaker = tokenMaker
 	app, err := util.InitializeFirebaseApp(context.Background(), nil)
+	server.taskDistributor = distributor
 
 	if err != nil {
 		return nil, err

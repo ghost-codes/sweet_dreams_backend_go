@@ -2,11 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/gost-codes/sweet_dreams/api"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/util"
+	"github.com/gost-codes/sweet_dreams/worker"
+	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"
 )
 
@@ -22,9 +25,23 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-
-	server, err := api.NewServer(*store, config)
+	redisOpts := asynq.RedisClientOpt{
+		Addr: config.RedisServerAddress,
+	}
+	taskDistributor := worker.NewRedisTaskDistributor(redisOpts)
+	go runTaskProcessor(redisOpts, *store)
+	server, err := api.NewServer(*store, config, taskDistributor)
 
 	server.Start(nil)
 	return
+}
+
+func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+	fmt.Println("Processor Started")
+	err := taskProcessor.Start()
+
+	if err != nil {
+		log.Fatal("failed to start task processor: %w", err)
+	}
 }

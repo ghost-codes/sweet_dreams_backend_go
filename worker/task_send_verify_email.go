@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/gost-codes/sweet_dreams/mail"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -55,5 +56,15 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 
 	//TODO: send email to user
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).Str("email", user.Email).Msg("Proccess task")
-	return nil
+
+	sender := mail.NewGmailSender("Sweet Dreams", "compounddork@gmail.com", "qsvgyqpgjzhurqiu")
+	subject := "Test email from me"
+	to := []string{"hopedorkenoo@gmail.com"}
+	content := `
+	<h1>Hello Email</h1>
+	<p> This is a test email from sweet dreams golang backend<br> <a href="https://google.com">Check this out</a></p>
+	`
+
+	return sender.SendEmail(subject, content, to, nil, nil, nil)
+
 }

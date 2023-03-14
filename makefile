@@ -16,4 +16,7 @@ sqlc:
 server:
 	go run main.go
 
-.PHONY: sqlc migrateup migrateup1 migratedown migratedown1 server
+redis:
+	docker run --name redis -p 6379:6379 -d redis
+
+.PHONY: sqlc migrateup migrateup1 migratedown migratedown1 server redis
