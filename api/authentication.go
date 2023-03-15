@@ -12,6 +12,7 @@ import (
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/gost-codes/sweet_dreams/worker"
+	"github.com/hibiken/asynq"
 	"github.com/lib/pq"
 )
 
@@ -99,7 +100,12 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 	}
 
 	//TODO: send verification email to client using redis
-	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username})
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(10 * time.Second),
+		asynq.Queue(worker.CriticalQueue),
+	}
+	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username}, opts...)
 
 	if err != nil {
 		err = fmt.Errorf("failed to distribute send verified email task: %w", err)
