@@ -29,15 +29,15 @@ func main() {
 		Addr: config.RedisServerAddress,
 	}
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpts)
-	go runTaskProcessor(redisOpts, *store)
+	go runTaskProcessor(redisOpts, *store, config)
 	server, err := api.NewServer(*store, config, taskDistributor)
 
 	server.Start(nil)
 	return
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, config util.Config) {
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, config)
 	fmt.Println("Processor Started")
 	err := taskProcessor.Start()
 

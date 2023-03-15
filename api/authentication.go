@@ -74,18 +74,36 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	args := db.CreateuserParams{
-		Username:       req.Username,
-		FirstName:      req.FirstName,
-		LastName:       req.LastName,
-		Email:          req.Email,
-		Contact:        &req.Contact,
-		HashedPassword: &hasedPassword,
-		SecurityKey:    uuid.NewString(),
+	args := db.CreateUserTxParams{
+
+		CreateuserParams: db.CreateuserParams{
+			Username:       req.Username,
+			FirstName:      req.FirstName,
+			LastName:       req.LastName,
+			Email:          req.Email,
+			Contact:        &req.Contact,
+			HashedPassword: &hasedPassword,
+			SecurityKey:    uuid.NewString(),
+		},
+		AterTx: func(user db.User) error {
+			//TODO: send verification email to client using redis
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.CriticalQueue),
+			}
+			err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username}, opts...)
+			if err != nil {
+
+				return fmt.Errorf("failed to distribute send verified email task: %w", err)
+			}
+			return nil
+
+		},
 	}
 
 	//-------------------> TODO: convert to TX
-	user, err := server.store.Createuser(ctx, args)
+	createUserTxResult, err := server.store.CreateUserTx(ctx, args)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
@@ -99,29 +117,16 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	//TODO: send verification email to client using redis
-	opts := []asynq.Option{
-		asynq.MaxRetry(10),
-		asynq.ProcessIn(10 * time.Second),
-		asynq.Queue(worker.CriticalQueue),
-	}
-	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username}, opts...)
-
-	if err != nil {
-		err = fmt.Errorf("failed to distribute send verified email task: %w", err)
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
 	//------------------>
-	res := newUserResponse(user)
+	res := newUserResponse(createUserTxResult.User)
 
-	accessToken, _, err := server.tokenMaker.CreateToken(req.Username, user.SecurityKey, server.config.AccessTokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(req.Username, createUserTxResult.User.SecurityKey, server.config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 
 	}
-	refreshToken, _, err := server.tokenMaker.CreateToken(req.Username, user.SecurityKey, server.config.RefreshTokenDuration)
+	refreshToken, _, err := server.tokenMaker.CreateToken(req.Username, createUserTxResult.User.SecurityKey, server.config.RefreshTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

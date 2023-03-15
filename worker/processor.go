@@ -4,6 +4,7 @@ import (
 	"context"
 
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
+	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/hibiken/asynq"
 )
 
@@ -20,9 +21,10 @@ type TaskProcessor interface {
 type RedisTaskProcessor struct {
 	server *asynq.Server
 	store  db.Store
+	config util.Config
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, config util.Config) TaskProcessor {
 	server := asynq.NewServer(redisOpt, asynq.Config{
 		Queues: map[string]int{
 			CriticalQueue: 10,
@@ -33,6 +35,7 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskPr
 	return &RedisTaskProcessor{
 		server: server,
 		store:  store,
+		config: config,
 	}
 
 }
