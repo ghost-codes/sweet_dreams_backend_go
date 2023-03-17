@@ -311,3 +311,65 @@ func (server *Server) signInUserSocial(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, loginUserResponse{RefreshToken: refresh_token, AccessToken: accessToken, User: userRes})
 }
+
+type verifyEmailReq struct {
+	ID   int64  `form:"id" binding:"required"`
+	Code string `form:"code" binding:"required,min=64"`
+}
+
+func (server *Server) verifyEmail(ctx *gin.Context) {
+	var req verifyEmailReq
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	verifyEmail, err := server.store.GetVerifyEmail(ctx, req.ID)
+	if err != nil || verifyEmail.SecretKey != req.Code {
+		err := fmt.Errorf("invalid verification link:%w", err)
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if time.Now().After(verifyEmail.ExpiredAt) {
+		err := fmt.Errorf("verification link has expired")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// replace user's email when user data email is different from verify_email email
+	user, err := server.store.GetUser(ctx, *verifyEmail.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	now := time.Now()
+	arg := db.UpdateUserParams{
+		ID:                user.ID,
+		Username:          user.Username,
+		Email:             verifyEmail.Email,
+		FirstName:         user.FirstName,
+		LastName:          user.LastName,
+		HashedPassword:    user.HashedPassword,
+		AvatarUrl:         user.AvatarUrl,
+		Contact:           user.Contact,
+		SecurityKey:       uuid.NewString(),
+		VerifiedAt:        &now,
+		TwitterSocial:     user.TwitterSocial,
+		AppleSocial:       user.AppleSocial,
+		GoogleSocial:      user.GoogleSocial,
+		CreatedAt:         user.CreatedAt,
+		PasswordChangedAt: user.PasswordChangedAt,
+	}
+
+	updatedUser, err := server.store.UpdateUser(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedUser)
+
+}

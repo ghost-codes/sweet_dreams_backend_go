@@ -116,31 +116,32 @@ UPDATE users
   avatar_url = $7,
   contact = $8,
   security_key = $9,
-  password_changed_at = $9,
-  verified_at = $10,
-  created_at = $11,
-   twitter_social=$12,
-  google_social=$13,
-  apple_social=$14 
+  password_changed_at = $10,
+  verified_at = $11,
+  created_at = $12,
+   twitter_social=$13,
+  google_social=$14,
+  apple_social=$15 
 WHERE id = $1
 RETURNING id, username, first_name, last_name, email, hashed_password, avatar_url, contact, security_key, password_changed_at, verified_at, created_at, twitter_social, google_social, apple_social
 `
 
 type UpdateUserParams struct {
-	ID             int64      `json:"id"`
-	Username       string     `json:"username"`
-	FirstName      string     `json:"first_name"`
-	LastName       string     `json:"last_name"`
-	Email          string     `json:"email"`
-	HashedPassword *string    `json:"hashed_password"`
-	AvatarUrl      *string    `json:"avatar_url"`
-	Contact        *string    `json:"contact"`
-	SecurityKey    string     `json:"security_key"`
-	VerifiedAt     *time.Time `json:"verified_at"`
-	CreatedAt      time.Time  `json:"created_at"`
-	TwitterSocial  bool       `json:"twitter_social"`
-	GoogleSocial   bool       `json:"google_social"`
-	AppleSocial    bool       `json:"apple_social"`
+	ID                int64      `json:"id"`
+	Username          string     `json:"username"`
+	FirstName         string     `json:"first_name"`
+	LastName          string     `json:"last_name"`
+	Email             string     `json:"email"`
+	HashedPassword    *string    `json:"hashed_password"`
+	AvatarUrl         *string    `json:"avatar_url"`
+	Contact           *string    `json:"contact"`
+	SecurityKey       string     `json:"security_key"`
+	PasswordChangedAt time.Time  `json:"password_changed_at"`
+	VerifiedAt        *time.Time `json:"verified_at"`
+	CreatedAt         time.Time  `json:"created_at"`
+	TwitterSocial     bool       `json:"twitter_social"`
+	GoogleSocial      bool       `json:"google_social"`
+	AppleSocial       bool       `json:"apple_social"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
@@ -154,6 +155,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.AvatarUrl,
 		arg.Contact,
 		arg.SecurityKey,
+		arg.PasswordChangedAt,
 		arg.VerifiedAt,
 		arg.CreatedAt,
 		arg.TwitterSocial,

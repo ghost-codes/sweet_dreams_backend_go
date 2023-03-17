@@ -27,12 +27,12 @@ UPDATE users
   avatar_url = $7,
   contact = $8,
   security_key = $9,
-  password_changed_at = $9,
-  verified_at = $10,
-  created_at = $11,
-   twitter_social=$12,
-  google_social=$13,
-  apple_social=$14 
+  password_changed_at = $10,
+  verified_at = $11,
+  created_at = $12,
+   twitter_social=$13,
+  google_social=$14,
+  apple_social=$15 
 WHERE id = $1
 RETURNING *;
 

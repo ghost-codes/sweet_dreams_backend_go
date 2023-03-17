@@ -66,3 +66,13 @@ type User struct {
 	GoogleSocial      bool       `json:"google_social"`
 	AppleSocial       bool       `json:"apple_social"`
 }
+
+type VerifyEmail struct {
+	ID        int64     `json:"id"`
+	Username  *string   `json:"username"`
+	Email     string    `json:"email"`
+	SecretKey string    `json:"secret_key"`
+	IsUsed    bool      `json:"is_used"`
+	ExpiredAt time.Time `json:"expired_at"`
+	CreatedAt time.Time `json:"created_at"`
+}

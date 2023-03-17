@@ -19,4 +19,7 @@ server:
 redis:
 	docker run --name redis -p 6379:6379 -d redis
 
-.PHONY: sqlc migrateup migrateup1 migratedown migratedown1 server redis
+new_migration:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
+.PHONY: sqlc migrateup migrateup1 migratedown migratedown1 server redis new_migration
