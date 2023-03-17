@@ -7,6 +7,7 @@ import (
 
 	"github.com/gost-codes/sweet_dreams/api"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
+	"github.com/gost-codes/sweet_dreams/mail"
 	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/gost-codes/sweet_dreams/worker"
 	"github.com/hibiken/asynq"
@@ -37,7 +38,8 @@ func main() {
 }
 
 func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, config util.Config) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, config)
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 	fmt.Println("Processor Started")
 	err := taskProcessor.Start()
 

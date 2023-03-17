@@ -4,7 +4,7 @@ import (
 	"context"
 
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
-	"github.com/gost-codes/sweet_dreams/util"
+	"github.com/gost-codes/sweet_dreams/mail"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -22,10 +22,10 @@ type TaskProcessor interface {
 type RedisTaskProcessor struct {
 	server *asynq.Server
 	store  db.Store
-	config util.Config
+	mailer mail.EmailSender
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, config util.Config) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, mailer mail.EmailSender) TaskProcessor {
 	server := asynq.NewServer(redisOpt, asynq.Config{
 		Queues: map[string]int{
 			CriticalQueue: 10,
@@ -40,7 +40,7 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, config
 	return &RedisTaskProcessor{
 		server: server,
 		store:  store,
-		config: config,
+		mailer: mailer,
 	}
 
 }

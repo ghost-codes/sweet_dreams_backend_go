@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gost-codes/sweet_dreams/mail"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -57,7 +56,6 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	//TODO: send email to user
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).Str("email", user.Email).Msg("Proccess task")
 
-	sender := mail.NewGmailSender(processor.config.EmailSenderName, processor.config.EmailSenderAddress, processor.config.EmailSenderPassword)
 	subject := "Verify Email"
 	to := []string{user.Email}
 	content := `
@@ -65,6 +63,6 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	<p> Please verify email inorder to have access to your account with this passcode</a></p>
 	`
 
-	return sender.SendEmail(subject, content, to, nil, nil, nil)
+	return processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
 
 }
