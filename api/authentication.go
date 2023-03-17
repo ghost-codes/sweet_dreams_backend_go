@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
+	"github.com/gost-codes/sweet_dreams/token"
 	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/gost-codes/sweet_dreams/worker"
 	"github.com/hibiken/asynq"
@@ -370,6 +371,20 @@ func (server *Server) verifyEmail(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updatedUser)
+	ctx.JSON(http.StatusOK, newUserResponse(updatedUser))
+}
 
+func (server *Server) sendVerificationEmail(ctx *gin.Context) {
+	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	err := server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{
+		Username: payload.Username,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, map[string]string{"success": "verification email successfully sent"})
 }

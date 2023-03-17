@@ -50,6 +50,11 @@ func (server *Server) setupRouter() {
 	router.POST("/users/login", server.loginWithEmailPassword)
 	router.POST("/users/socials/sigin", server.signInUserSocial)
 	router.GET("/verify_email", server.verifyEmail)
+
+	//with auth middleware
+	authRouter := router.Use(authMiddleware(server.tokenMaker))
+
+	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
 	server.router = router
 }
 
