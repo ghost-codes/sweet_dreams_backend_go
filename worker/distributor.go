@@ -8,6 +8,7 @@ import (
 
 type TaskDistributor interface {
 	DistributeTaskSendVerifyEmail(ctx context.Context, payload *PayloadSendVerifyEmail, opts ...asynq.Option) error
+	DistributeTaskSendAdminEmail(ctx context.Context, payload *PayloadSendAdminEmail, opts ...asynq.Option) error
 }
 
 type RedisTaskDistributor struct {

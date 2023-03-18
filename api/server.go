@@ -46,16 +46,20 @@ func NewServer(store db.Store, config util.Config, distributor worker.TaskDistri
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
+	//User router
 	router.POST("/users/sign_up", server.createUserWithEmailPassword)
 	router.POST("/users/login", server.loginWithEmailPassword)
 	router.POST("/users/socials/sigin", server.signInUserSocial)
 	router.GET("/verify_email", server.verifyEmail)
 
+	//Admin router
+	router.POST("/admin/create", server.createAdmin)
+	server.router = router
+
 	//with auth middleware
 	authRouter := router.Use(authMiddleware(server.tokenMaker))
-
 	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
-	server.router = router
+
 }
 
 func (server *Server) Start(addr *string) {

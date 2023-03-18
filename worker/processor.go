@@ -17,6 +17,7 @@ const (
 type TaskProcessor interface {
 	Start() error
 	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
+	ProcessTaskSendAdminEmail(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {
@@ -49,5 +50,6 @@ func (processor *RedisTaskProcessor) Start() error {
 	serverMux := asynq.NewServeMux()
 
 	serverMux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	serverMux.HandleFunc(TaskSendAdminEmail, processor.ProcessTaskSendAdminEmail)
 	return processor.server.Start(serverMux)
 }
