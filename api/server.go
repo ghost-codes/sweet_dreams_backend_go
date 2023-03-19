@@ -58,11 +58,16 @@ func (server *Server) setupRouter() {
 	//with auth middleware
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker, &server.store))
 	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
+	authRouter.GET("/nurses", server.fetchNurses)
 
 	superAdminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, true))
 	superAdminRouter.POST("/create", server.createAdmin)
 
-	// adminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, false))
+	adminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, false))
+	adminRouter.POST("/nurses/create", server.createNurse)
+	adminRouter.GET("/nurses/:id", server.fetchNurse)
+	adminRouter.GET("/nurses", server.fetchNurses)
+	adminRouter.DELETE("/nurses/:id", server.deleteNurse)
 	server.router = router
 }
 
@@ -79,4 +84,8 @@ func (server *Server) Start(addr *string) {
 
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
+}
+
+func genericResponse(msg string) gin.H {
+	return gin.H{"error": msg}
 }
