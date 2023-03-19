@@ -12,4 +12,4 @@ INSERT INTO admins(
 
 -- name: GetAdmin :one
 SELECT * FROM admins
-WHERE username=$1;
+WHERE username=$1 OR email=$1;

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -75,4 +76,74 @@ func (server *Server) createAdmin(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, map[string]string{"message": "admin successfully created"})
+}
+
+type adminLoginReq struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type admin struct {
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	FullName  string    `json:"full_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func Newadmin(Admin db.Admin) admin {
+	return admin{
+		ID:        Admin.ID,
+		Username:  Admin.Username,
+		FullName:  Admin.FullName,
+		Email:     Admin.Email,
+		CreatedAt: Admin.CreatedAt,
+	}
+}
+
+type adminLoginResponse struct {
+	Admin       admin  `json:"admin"`
+	AccessToken string `json:"access_token"`
+}
+
+func (server *Server) adminLogin(ctx *gin.Context) {
+	var req adminLoginReq
+
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	admin, err := server.store.GetAdmin(ctx, req.Username)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err := fmt.Errorf("admin with credential %s does not exist", req.Username)
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if err := util.ComparePassword(req.Password, admin.HashedPassword); err != nil {
+		err := fmt.Errorf("invalid credentials")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	accessToken, _, err := server.tokenMaker.CreateToken(admin.Username, "", time.Duration(1*time.Hour))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	res := adminLoginResponse{
+		Admin:       Newadmin(admin),
+		AccessToken: accessToken,
+	}
+
+	ctx.JSON(http.StatusOK, res)
+
 }

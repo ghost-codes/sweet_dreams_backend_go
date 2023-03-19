@@ -50,7 +50,7 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin
 
 const getAdmin = `-- name: GetAdmin :one
 SELECT id, username, full_name, email, hashed_password, is_super, created_at FROM admins
-WHERE username=$1
+WHERE username=$1 OR email=$1
 `
 
 func (q *Queries) GetAdmin(ctx context.Context, username string) (Admin, error) {

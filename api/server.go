@@ -53,13 +53,17 @@ func (server *Server) setupRouter() {
 	router.GET("/verify_email", server.verifyEmail)
 
 	//Admin router
-	router.POST("/admin/create", server.createAdmin)
-	server.router = router
+	router.POST("/admin/login", server.adminLogin)
 
 	//with auth middleware
-	authRouter := router.Use(authMiddleware(server.tokenMaker))
+	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker, &server.store))
 	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
 
+	superAdminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, true))
+	superAdminRouter.POST("/create", server.createAdmin)
+
+	// adminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, false))
+	server.router = router
 }
 
 func (server *Server) Start(addr *string) {
