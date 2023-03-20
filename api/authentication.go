@@ -93,7 +93,7 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 				asynq.ProcessIn(10 * time.Second),
 				asynq.Queue(worker.CriticalQueue),
 			}
-			err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{Username: req.Username}, opts...)
+			err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{UserID: user.ID}, opts...)
 			if err != nil {
 
 				return fmt.Errorf("failed to distribute send verified email task: %w", err)
@@ -121,13 +121,13 @@ func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 	//------------------>
 	res := newUserResponse(createUserTxResult.User)
 
-	accessToken, _, err := server.tokenMaker.CreateToken(req.Username, createUserTxResult.User.SecurityKey, server.config.AccessTokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(createUserTxResult.User.ID, createUserTxResult.User.SecurityKey, server.config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 
 	}
-	refreshToken, _, err := server.tokenMaker.CreateToken(req.Username, createUserTxResult.User.SecurityKey, server.config.RefreshTokenDuration)
+	refreshToken, _, err := server.tokenMaker.CreateToken(createUserTxResult.User.ID, createUserTxResult.User.SecurityKey, server.config.RefreshTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -175,12 +175,12 @@ func (server *Server) loginWithEmailPassword(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, _, err := server.tokenMaker.CreateToken(user.Username, user.SecurityKey, server.config.AccessTokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(user.ID, user.SecurityKey, server.config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	refresh_token, _, err := server.tokenMaker.CreateToken(user.Username, user.SecurityKey, server.config.RefreshTokenDuration)
+	refresh_token, _, err := server.tokenMaker.CreateToken(user.ID, user.SecurityKey, server.config.RefreshTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -297,12 +297,12 @@ func (server *Server) signInUserSocial(ctx *gin.Context) {
 	}
 
 	//then login to proceed
-	accessToken, _, err := server.tokenMaker.CreateToken(user.Username, user.SecurityKey, server.config.AccessTokenDuration)
+	accessToken, _, err := server.tokenMaker.CreateToken(user.ID, user.SecurityKey, server.config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	refresh_token, _, err := server.tokenMaker.CreateToken(user.Username, user.SecurityKey, server.config.RefreshTokenDuration)
+	refresh_token, _, err := server.tokenMaker.CreateToken(user.ID, user.SecurityKey, server.config.RefreshTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -378,7 +378,7 @@ func (server *Server) sendVerificationEmail(ctx *gin.Context) {
 	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
 	err := server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, &worker.PayloadSendVerifyEmail{
-		Username: payload.Username,
+		UserID: payload.UserID,
 	})
 
 	if err != nil {

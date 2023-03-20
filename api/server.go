@@ -6,6 +6,8 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
 	"github.com/gost-codes/sweet_dreams/token"
 	"github.com/gost-codes/sweet_dreams/util"
@@ -46,6 +48,10 @@ func NewServer(store db.Store, config util.Config, distributor worker.TaskDistri
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
+	if binder, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		binder.RegisterValidation("bookingType", validateBookingType)
+	}
+
 	//User router
 	router.POST("/users/sign_up", server.createUserWithEmailPassword)
 	router.POST("/users/login", server.loginWithEmailPassword)
@@ -59,6 +65,7 @@ func (server *Server) setupRouter() {
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker, &server.store))
 	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
 	authRouter.GET("/nurses", server.fetchNurses)
+	authRouter.POST("/bookings/request", server.createBooking)
 
 	superAdminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, true))
 	superAdminRouter.POST("/create", server.createAdmin)

@@ -40,12 +40,12 @@ type Nurse struct {
 
 type Request struct {
 	ID            int64       `json:"id"`
-	UserID        *int64      `json:"user_id"`
-	Type          *string     `json:"type"`
+	UserID        int64       `json:"user_id"`
+	Type          string      `json:"type"`
 	PreferedNurse *int64      `json:"prefered_nurse"`
 	StartDate     time.Time   `json:"start_date"`
 	EndDate       time.Time   `json:"end_date"`
-	Location      interface{} `json:"location"`
+	Location      string `json:"location"`
 	CreatedAt     time.Time   `json:"created_at"`
 }
 

@@ -13,3 +13,8 @@ INSERT INTO admins(
 -- name: GetAdmin :one
 SELECT * FROM admins
 WHERE username=$1 OR email=$1;
+
+
+-- name: GetAdminByID :one
+SELECT * FROM admins
+WHERE id=$1 ;

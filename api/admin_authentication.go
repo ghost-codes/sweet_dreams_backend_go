@@ -133,7 +133,7 @@ func (server *Server) adminLogin(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, _, err := server.tokenMaker.CreateToken(admin.Username, "", time.Duration(1*time.Hour))
+	accessToken, _, err := server.tokenMaker.CreateToken(admin.ID, "", time.Duration(1*time.Hour))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

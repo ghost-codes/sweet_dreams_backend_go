@@ -18,8 +18,8 @@ CREATE TABLE "users" (
 
 CREATE TABLE "requests" (
   "id" bigserial PRIMARY KEY,
-  "user_id" bigint,
-  "type" varchar,
+  "user_id" bigint NOT NULL,
+  "type" varchar NOT NULL,
   "prefered_nurse" bigint,
   "start_date" timestamptz NOT NULL,
   "end_date" timestamptz NOT NULL,

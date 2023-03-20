@@ -67,3 +67,23 @@ func (q *Queries) GetAdmin(ctx context.Context, username string) (Admin, error) 
 	)
 	return i, err
 }
+
+const getAdminByID = `-- name: GetAdminByID :one
+SELECT id, username, full_name, email, hashed_password, is_super, created_at FROM admins
+WHERE id=$1
+`
+
+func (q *Queries) GetAdminByID(ctx context.Context, id int64) (Admin, error) {
+	row := q.db.QueryRowContext(ctx, getAdminByID, id)
+	var i Admin
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.FullName,
+		&i.Email,
+		&i.HashedPassword,
+		&i.IsSuper,
+		&i.CreatedAt,
+	)
+	return i, err
+}

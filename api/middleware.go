@@ -49,10 +49,10 @@ func authMiddleware(tokenMaker token.Maker, store *db.Store) gin.HandlerFunc {
 			return
 		}
 
-		user, err := store.GetUser(ctx, payload.Username)
+		user, err := store.GetUserByID(ctx, payload.UserID)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintf("user with username %s not found", payload.Username)})
+				ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintf("user with username %v not found", payload.UserID)})
 				return
 			}
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": "error occured"})
@@ -101,10 +101,10 @@ func adminAuthMiddleware(tokenMaker token.Maker, store *db.Store, is_super_check
 		}
 
 		if is_super_check {
-			admin, err := store.GetAdmin(ctx, payload.Username)
+			admin, err := store.GetAdminByID(ctx, payload.UserID)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintf("user with username %s not found", payload.Username)})
+					ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintf("user with username %v not found", payload.UserID)})
 					return
 				}
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]string{"error": "error occured"})
