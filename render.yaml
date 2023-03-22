@@ -1,0 +1,59 @@
+services:
+- type: web
+  name: sweet_dreams_go
+  env: docker
+  plan: free
+  dockerfilePath: Dockerfile
+  dockerContext: ./
+
+  envVars:
+    - key: GIN_MODE
+      value: release
+    - key: PORT
+      value: 4000
+    - key: DB_SOURCE
+      value: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable
+    - key: DB_HOST
+      fromDatabase:
+        name: sweet_dreams_go
+        property: host
+    - key: REDIS_SERVER_HOST
+      fromService:
+          type: redis
+          name: lightning
+          property: host
+    - key: REDIS_SERVER_PORT
+      fromService:
+          type: redis
+          name: lightning
+          property: port
+    - key: DB_PORT
+      fromDatabase:
+        name: sweet_dreams_go
+        property: port
+    - key: DB_USER
+      fromDatabase:
+        name: sweet_dreams_go
+        property: user
+    - key: DB_PASSWORD
+      fromDatabase:
+        name: sweet_dreams_go
+        property: password
+    - key: DB_NAME
+      fromDatabase:
+        name: sweet_dreams_go
+        property: database
+   
+- type: redis
+    name: lightning
+    ipAllowList: # required
+      - source: 0.0.0.0/0
+        description: everywhere
+    plan: free # optional (defaults to starter)
+    maxmemoryPolicy: noeviction # optional (defaults to allkeys-lru)
+
+databases:
+  - name: sweet_dreams_go
+    plan: free
+    databaseName: sweet_dreams_go
+

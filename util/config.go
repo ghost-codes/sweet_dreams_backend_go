@@ -21,7 +21,8 @@ type Config struct {
 	EmailSenderAddress   string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
 	EmailSenderPassword  string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 	EmailSenderName      string        `mapstructure:"EMAIL_SENDER_NAME"`
-	RedisServerAddress   string        `mapstructure:"REDIS_SERVER_ADDRESS"`
+	RedisServerHost      string        `mapstructure:"REDIS_SERVER_HOST"`
+	RedisServerPort      string        `mapstructure:"REDIS_SERVER_PORT"`
 	Host                 string        `mapstructure:"HOST"`
 
 	// DBSource            string        `mapstructure:"DB_SOURCE"`
@@ -29,6 +30,9 @@ type Config struct {
 
 func (config *Config) DBSource() string {
 	return fmt.Sprintf("postgresql://%v:%v@%v:%v/%v?sslmode=disable", config.DBUser, config.DBPassword, config.DBHOST, config.DBPort, config.DBName)
+}
+func (config *Config) RedisServerAddress() string {
+	return fmt.Sprintf("%s:%s", config.RedisServerHost, config.RedisServerPort)
 }
 
 func LoadConfig(path string) (config Config, err error) {

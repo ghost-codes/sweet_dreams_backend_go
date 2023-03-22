@@ -40,7 +40,7 @@ func main() {
 
 	store := db.NewStore(conn)
 	redisOpts := asynq.RedisClientOpt{
-		Addr: config.RedisServerAddress,
+		Addr: config.RedisServerAddress(),
 	}
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpts)
 	go runTaskProcessor(redisOpts, *store, config)
