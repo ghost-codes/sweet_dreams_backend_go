@@ -4,6 +4,29 @@ definitions:
       error:
         type: string
     type: object
+  api.UserResponse:
+    properties:
+      avatar_url:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      password_changed_at:
+        type: string
+      username:
+        type: string
+      verified_at:
+        type: string
+    type: object
   api.createBookingReq:
     properties:
       end_date:
@@ -24,6 +47,97 @@ definitions:
     - long
     - start_date
     - type
+    type: object
+  api.createNurseReq:
+    properties:
+      contact:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+    required:
+    - contact
+    - email
+    - full_name
+    type: object
+  api.createUserWithEmailPasswordReq:
+    properties:
+      contact:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - username
+    type: object
+  api.loginUserReq:
+    properties:
+      password:
+        type: string
+      username_email:
+        type: string
+    required:
+    - password
+    - username_email
+    type: object
+  api.loginUserResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/api.UserResponse'
+    type: object
+  db.Approval:
+    properties:
+      approved_by:
+        type: integer
+      assigned_nurse:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      notes:
+        type: string
+      request_id:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  db.Nurse:
+    properties:
+      contact:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      profile_picture:
+        type: string
     type: object
   db.Request:
     properties:
@@ -46,7 +160,190 @@ definitions:
 info:
   contact: {}
 paths:
+  /admin/bookings/approvals:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: query
+        name: count
+        type: integer
+      - description: ' '
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Approval'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+  /admin/bookings/approvals/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: approval deleted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Approval'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+  /admin/bookings/request:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Request'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+  /admin/bookings/request/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Request'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+  /bookings/approvals:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: query
+        name: count
+        type: integer
+      - description: ' '
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Approval'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Booking requests
   /bookings/request:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: query
+        name: count
+        type: integer
+      - description: ' '
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Request'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: create booking request for user
+      tags:
+      - Booking requests
     post:
       consumes:
       - application/json
@@ -64,18 +361,269 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/db.Request'
-            type: array
+            $ref: '#/definitions/db.Request'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorResponse'
       security:
       - bearerAuth: []
-      summary: List accounts
+      summary: create booking request for user
       tags:
-      - accounts
+      - Booking requests
+  /bookings/request/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Booking requests
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Request'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Booking requests
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: log existing users in with email and password
+      parameters:
+      - description: ' '
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.loginUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.loginUserResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: log existing user in
+      tags:
+      - Authentication
+  /nurses:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: query
+        name: count
+        type: integer
+      - description: ' '
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Nurse'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Booking requests
+  /nurses/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: nurse deleted successfully
+          schema:
+            type: string
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+    get:
+      consumes:
+      - application/json
+      description: short code is sent to the user's email for verification
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Nurse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: send verification email
+      tags:
+      - Booking requests
+  /nurses/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ' '
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.createNurseReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: nurse has been created successfully
+          schema:
+            type: string
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      tags:
+      - Admin endpoints
+  /send_verification_email:
+    get:
+      consumes:
+      - application/json
+      description: short code is sent to the user's email for verification
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: verification email successfully sent
+          schema:
+            type: string
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - bearerAuth: []
+      summary: send verification email
+      tags:
+      - Authentication
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: create new user using email and password
+      parameters:
+      - description: ' '
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.createUserWithEmailPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.loginUserResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: signup new user
+      tags:
+      - Authentication
+  /verify_email:
+    post:
+      consumes:
+      - application/json
+      description: verify email using short code
+      parameters:
+      - description: ' '
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.loginUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: verify email
+      tags:
+      - Authentication
 securityDefinitions:
   bearerAuth:
     in: header

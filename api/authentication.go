@@ -60,6 +60,15 @@ func newUserResponse(user db.User) UserResponse {
 	}
 }
 
+// @Summary      signup new user
+// @Description  create new user using email and password
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        body    body   	createUserWithEmailPasswordReq  true " "
+// @Success      200  	{object}   	loginUserResponse
+// @response     default  {object}  	ErrorResponse
+// @Router       /signup [post]
 func (server *Server) createUserWithEmailPassword(ctx *gin.Context) {
 	req := createUserWithEmailPasswordReq{}
 
@@ -142,6 +151,15 @@ type loginUserReq struct {
 	Password      string `json:"password" binding:"required"`
 }
 
+// @Summary      log existing user in
+// @Description  log existing users in with email and password
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        body    body   	loginUserReq  true " "
+// @Success      200  	{object}   	loginUserResponse
+// @response     default  {object}  	ErrorResponse
+// @Router       /login [post]
 func (server *Server) loginWithEmailPassword(ctx *gin.Context) {
 	req := loginUserReq{}
 
@@ -318,6 +336,15 @@ type verifyEmailReq struct {
 	Code string `form:"code" binding:"required,min=64"`
 }
 
+// @Summary      verify email
+// @Description  verify email using short code
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        body    body   	loginUserReq  true " "
+// @Success      200  	{object}    UserResponse
+// @response     default  {object}  	ErrorResponse
+// @Router       /verify_email [post]
 func (server *Server) verifyEmail(ctx *gin.Context) {
 	var req verifyEmailReq
 
@@ -374,6 +401,15 @@ func (server *Server) verifyEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newUserResponse(updatedUser))
 }
 
+// @Summary      send verification email
+// @Description  short code is sent to the user's email for verification
+// @Tags         Authentication
+// @Security 	bearerAuth
+// @Accept       json
+// @Produce      json
+// @Success      200  	string    "verification email successfully sent"
+// @response     default  {object}  	ErrorResponse
+// @Router       /send_verification_email [get]
 func (server *Server) sendVerificationEmail(ctx *gin.Context) {
 	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 

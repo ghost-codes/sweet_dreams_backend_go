@@ -57,17 +57,17 @@ func (server *Server) setupRouter() {
 	}
 
 	//User router
-	router.POST("/users/sign_up", server.createUserWithEmailPassword)
+	router.POST("/users/signup", server.createUserWithEmailPassword)
 	router.POST("/users/login", server.loginWithEmailPassword)
 	router.POST("/users/socials/sigin", server.signInUserSocial)
-	router.GET("/verify_email", server.verifyEmail)
+	router.POST("/verify_email", server.verifyEmail)
 
 	//Admin router
 	router.POST("/admin/login", server.adminLogin)
 
 	//with auth middleware
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker, &server.store))
-	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
+	authRouter.GET("/send_verification_email", server.sendVerificationEmail)
 	authRouter.GET("/nurses", server.fetchNurses)
 	authRouter.POST("/bookings/request", server.createBooking)
 	authRouter.POST("/bookings/approvals", server.userApprovals)

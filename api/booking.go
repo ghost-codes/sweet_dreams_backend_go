@@ -32,11 +32,11 @@ type createBookingReq struct {
 // @Summary      create booking request for user
 // @Security 	  bearerAuth
 // @Description  get accounts
-// @Tags         Booking request
+// @Tags         Booking requests
 // @Accept       json
 // @Produce      json
 // @Param        body    body     createBookingReq  true "create booking request by user"
-// @Success      200  {array}   db.Request
+// @Success      200  {object}   db.Request
 // @Failure      400  {object}  ErrorResponse
 // @Router       /bookings/request [post]
 func (server *Server) createBooking(ctx *gin.Context) {
@@ -77,6 +77,16 @@ type bookingRequesParams struct {
 	Page  int32 `form:"page" binding:"default=1"`
 }
 
+// @Summary      create booking request for user
+// @Security 	  bearerAuth
+// @Tags         Booking requests
+// @Accept       json
+// @Produce      json
+// @Param      count 		query	int false " "
+// @Param      	page 		query	int false " "
+// @Success      200  {array}   db.Request
+// @Failure      400  {object}  ErrorResponse
+// @Router       /bookings/request [get]
 func (server *Server) listUserBookingReqs(ctx *gin.Context) {
 
 	var queryParams bookingRequesParams
@@ -112,6 +122,14 @@ type bookingReqID struct {
 	ID int64 `uri:"id" binding:"required"`
 }
 
+// @Security 	  bearerAuth
+// @Tags         Booking requests
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int true " "
+// @Success      200  {object}   db.Request
+// @Failure      400  {object}  ErrorResponse
+// @Router       /bookings/request/{id} [get]
 func (server *Server) bookingReq(ctx *gin.Context) {
 
 	var params bookingReqID
@@ -141,6 +159,14 @@ func (server *Server) bookingReq(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, reqs)
 }
 
+// @Security 	  bearerAuth
+// @Tags         Booking requests
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int true " "
+// @Success      200  string   "deleted successfully"
+// @Failure      400  {object}  ErrorResponse
+// @Router       /bookings/request/{id} [delete]
 func (server *Server) deleteBookingReq(ctx *gin.Context) {
 
 	var params bookingReqID
@@ -170,6 +196,13 @@ func (server *Server) deleteBookingReq(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, genericResponse("Booking successfully deleted"))
 }
 
+// @Security 	  bearerAuth
+// @Tags         Admin endpoints
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   db.Request
+// @Failure      400  {object}  ErrorResponse
+// @Router       /admin/bookings/request [get]
 func (server *Server) adminBookings(ctx *gin.Context) {
 	bookingReqs, err := server.store.GetAllBookingsByAdmin(ctx)
 
@@ -185,6 +218,14 @@ func (server *Server) adminBookings(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, bookingReqs)
 }
 
+// @Security 	  bearerAuth
+// @Tags         Admin endpoints
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int true " "
+// @Success      200  {object}   db.Request
+// @Failure      400  {object}  ErrorResponse
+// @Router      /admin/bookings/request/{id} [get]
 func (server *Server) adminBookingsByID(ctx *gin.Context) {
 	var req bookingReqID
 
@@ -216,6 +257,14 @@ type approveBooking struct {
 	Notes         *string `json:"notes"`
 }
 
+// @Security 	  bearerAuth
+// @Tags         Admin endpoints
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int false " "
+// @Success      200  {object}   db.Approval
+// @Failure      400  {object}  ErrorResponse
+// @Router       /admin/bookings/approvals/{id} [post]
 func (server *Server) adminApproveBooking(ctx *gin.Context) {
 	var req approveBooking
 
@@ -258,6 +307,14 @@ func (server *Server) adminApproveBooking(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, approval)
 }
 
+// @Security 	  bearerAuth
+// @Tags         Admin endpoints
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int false " "
+// @Success      200  string   "approval deleted"
+// @Failure      400  {object}  ErrorResponse
+// @Router       /admin/bookings/approvals/{id} [delete]
 func (server *Server) deleteApprovals(ctx *gin.Context) {
 	var param bookingReqID
 
@@ -276,6 +333,15 @@ func (server *Server) deleteApprovals(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, genericResponse("Approval successfully deleted"))
 }
 
+// @Security 	  bearerAuth
+// @Tags         Booking requests
+// @Accept       json
+// @Produce      json
+// @Param      count 		query	int false " "
+// @Param      	page 		query	int false " "
+// @Success      200  {array}   db.Approval
+// @Failure      400  {object}  ErrorResponse
+// @Router       /bookings/approvals [get]
 func (server *Server) userApprovals(ctx *gin.Context) {
 	var pagination paginationData
 
@@ -307,6 +373,16 @@ func (server *Server) userApprovals(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, approvals)
 
 }
+
+// @Security 	  bearerAuth
+// @Tags         Admin endpoints
+// @Accept       json
+// @Produce      json
+// @Param      count 		query	int false " "
+// @Param      	page 		query	int false " "
+// @Success      200  {array}   db.Approval
+// @Failure      400  {object}  ErrorResponse
+// @Router       /admin/bookings/approvals [get]
 func (server *Server) adminGetApprovals(ctx *gin.Context) {
 	var pagination paginationData
 
@@ -334,5 +410,4 @@ func (server *Server) adminGetApprovals(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, approvals)
-
 }

@@ -16,10 +16,18 @@ type createNurseReq struct {
 }
 
 type paginationData struct {
-	Page  int32 `form:"page" binding:"required,min=1"`
-	Count int32 `form:"count" binding:"required,min=5,max=20"`
+	Page  int32 `form:"page" binding:"default=1,min=1"`
+	Count int32 `form:"count" binding:"default=20,min=5,max=20"`
 }
 
+// @Tags         Admin endpoints
+// @Security 	bearerAuth
+// @Accept       json
+// @Produce      json
+// @Param      	body 		body 		createNurseReq 	true	 " "
+// @Success     200  		string    	"nurse has been created successfully"
+// @response    default  	{object}  	ErrorResponse
+// @Router      /nurses/create 	[post]
 func (server *Server) createNurse(ctx *gin.Context) {
 	var req createNurseReq
 
@@ -45,6 +53,15 @@ func (server *Server) createNurse(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, genericResponse("nurse has be created successfully"))
 }
 
+// @Tags         Booking requests
+// @Security 	bearerAuth
+// @Accept       json
+// @Produce      json
+// @Param      count 		query	int false " "
+// @Param      	page 		query	int false " "
+// @Success     200  		{array}    db.Nurse
+// @response    default  	{object}  	ErrorResponse
+// @Router      /nurses 	[get]
 func (server *Server) fetchNurses(ctx *gin.Context) {
 	var pagination paginationData
 
@@ -68,6 +85,16 @@ func (server *Server) fetchNurses(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nurses)
 }
 
+// @Summary      send verification email
+// @Description  short code is sent to the user's email for verification
+// @Tags         Booking requests
+// @Security 	bearerAuth
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int false " "
+// @Success     200  		{object} 	db.Nurse
+// @response    default  	{object}  	ErrorResponse
+// @Router      /nurses/{id}	[get]
 func (server *Server) fetchNurse(ctx *gin.Context) {
 	type idParam struct {
 		ID int64 `json:"id" binding:"required"`
@@ -94,6 +121,14 @@ func (server *Server) fetchNurse(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nurse)
 }
 
+// @Tags         Admin endpoints
+// @Security 	bearerAuth
+// @Accept       json
+// @Produce      json
+// @Param      	id 		path	int false " "
+// @Success     200  		string    "nurse deleted successfully"
+// @response    default  	{object}  	ErrorResponse
+// @Router      /nurses/{id}	[delete]
 func (server *Server) deleteNurse(ctx *gin.Context) {
 	type idParam struct {
 		ID int64 `json:"id" binding:"required"`
