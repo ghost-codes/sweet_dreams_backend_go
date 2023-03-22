@@ -39,6 +39,7 @@ CREATE TABLE "nurses" (
 CREATE TABLE "approvals" (
   "id" bigserial,
   "request_id" bigint NOT NULL UNIQUE,
+  "user_id" bigint NOT NULL,
   "assigned_nurse" bigint NOT NULL,
   "approved_by" bigint NOT NULL,
   "status" varchar NOT NULL,

@@ -21,6 +21,7 @@ type Admin struct {
 type Approval struct {
 	ID            int64     `json:"id"`
 	RequestID     int64     `json:"request_id"`
+	UserID        int64     `json:"user_id"`
 	AssignedNurse int64     `json:"assigned_nurse"`
 	ApprovedBy    int64     `json:"approved_by"`
 	Status        string    `json:"status"`
@@ -45,7 +46,7 @@ type Request struct {
 	PreferedNurse *int64      `json:"prefered_nurse"`
 	StartDate     time.Time   `json:"start_date"`
 	EndDate       time.Time   `json:"end_date"`
-	Location      string `json:"location"`
+	Location      interface{} `json:"location"`
 	CreatedAt     time.Time   `json:"created_at"`
 }
 

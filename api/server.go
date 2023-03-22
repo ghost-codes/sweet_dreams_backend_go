@@ -66,6 +66,10 @@ func (server *Server) setupRouter() {
 	authRouter.POST("/send_verification_email", server.sendVerificationEmail)
 	authRouter.GET("/nurses", server.fetchNurses)
 	authRouter.POST("/bookings/request", server.createBooking)
+	authRouter.POST("/bookings/approvals", server.userApprovals)
+	authRouter.GET("/bookings/request", server.listUserBookingReqs)
+	authRouter.GET("/bookings/request/:id", server.bookingReq)
+	authRouter.DELETE("/bookings/request/:id", server.deleteBookingReq)
 
 	superAdminRouter := router.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker, &server.store, true))
 	superAdminRouter.POST("/create", server.createAdmin)
@@ -75,6 +79,11 @@ func (server *Server) setupRouter() {
 	adminRouter.GET("/nurses/:id", server.fetchNurse)
 	adminRouter.GET("/nurses", server.fetchNurses)
 	adminRouter.DELETE("/nurses/:id", server.deleteNurse)
+	adminRouter.GET("/bookings/request", server.adminBookings)
+	adminRouter.GET("/bookings/request/:id", server.adminBookingsByID)
+	adminRouter.POST("/bookings/approvals", server.adminApproveBooking)
+	adminRouter.GET("/bookings/approvals", server.adminGetApprovals)
+	adminRouter.DELETE("/bookings/approvals/:id", server.deleteApprovals)
 	server.router = router
 }
 

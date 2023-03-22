@@ -56,3 +56,146 @@ func (q *Queries) CreateBookingRequest(ctx context.Context, arg CreateBookingReq
 	)
 	return i, err
 }
+
+const deleteBookingByID = `-- name: DeleteBookingByID :exec
+DELETE FROM requests
+WHERE user_id=$1 AND id=$2
+`
+
+type DeleteBookingByIDParams struct {
+	UserID int64 `json:"user_id"`
+	ID     int64 `json:"id"`
+}
+
+func (q *Queries) DeleteBookingByID(ctx context.Context, arg DeleteBookingByIDParams) error {
+	_, err := q.db.ExecContext(ctx, deleteBookingByID, arg.UserID, arg.ID)
+	return err
+}
+
+const getAllBookingsByAdmin = `-- name: GetAllBookingsByAdmin :many
+SELECT id, user_id, type, prefered_nurse, start_date, end_date, location, created_at FROM requests
+`
+
+func (q *Queries) GetAllBookingsByAdmin(ctx context.Context) ([]Request, error) {
+	rows, err := q.db.QueryContext(ctx, getAllBookingsByAdmin)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Request{}
+	for rows.Next() {
+		var i Request
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Type,
+			&i.PreferedNurse,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Location,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getBookingByID = `-- name: GetBookingByID :one
+SELECT id, user_id, type, prefered_nurse, start_date, end_date, location, created_at FROM requests
+WHERE user_id=$1 AND id=$2
+`
+
+type GetBookingByIDParams struct {
+	UserID int64 `json:"user_id"`
+	ID     int64 `json:"id"`
+}
+
+func (q *Queries) GetBookingByID(ctx context.Context, arg GetBookingByIDParams) (Request, error) {
+	row := q.db.QueryRowContext(ctx, getBookingByID, arg.UserID, arg.ID)
+	var i Request
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.PreferedNurse,
+		&i.StartDate,
+		&i.EndDate,
+		&i.Location,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getBookingsByAdminByID = `-- name: GetBookingsByAdminByID :one
+SELECT id, user_id, type, prefered_nurse, start_date, end_date, location, created_at FROM requests
+WHERE id=$1
+`
+
+func (q *Queries) GetBookingsByAdminByID(ctx context.Context, id int64) (Request, error) {
+	row := q.db.QueryRowContext(ctx, getBookingsByAdminByID, id)
+	var i Request
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.PreferedNurse,
+		&i.StartDate,
+		&i.EndDate,
+		&i.Location,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listUserBookingReqs = `-- name: ListUserBookingReqs :many
+SELECT id, user_id, type, prefered_nurse, start_date, end_date, location, created_at FROM requests
+WHERE user_id=$1
+LIMIT $2
+OFFSET $3
+`
+
+type ListUserBookingReqsParams struct {
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListUserBookingReqs(ctx context.Context, arg ListUserBookingReqsParams) ([]Request, error) {
+	rows, err := q.db.QueryContext(ctx, listUserBookingReqs, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Request{}
+	for rows.Next() {
+		var i Request
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Type,
+			&i.PreferedNurse,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Location,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
