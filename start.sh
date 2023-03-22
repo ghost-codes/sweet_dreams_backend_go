@@ -1,10 +1,10 @@
 #!/bin/sh
 
 set -e
-FILE=/app/.env
-if [ ! -f "$FILE" ]; then
-    touch .env
-fi
+# FILE=/app/.env
+# if [ ! -f "$FILE" ]; then
+#     touch .env
+# fi
 
 echo "run db migration"
 echo "=====> $DB_SOURCE"

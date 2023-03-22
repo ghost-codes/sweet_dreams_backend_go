@@ -37,7 +37,7 @@ func (config *Config) RedisServerAddress() string {
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("app.env")
 
 	viper.AutomaticEnv()
 

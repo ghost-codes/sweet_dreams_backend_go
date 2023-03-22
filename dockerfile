@@ -14,6 +14,7 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate ./migrate
 COPY db/migrations ./migrations
+COPY app.env .
 COPY start.sh .
 
 EXPOSE 3000
