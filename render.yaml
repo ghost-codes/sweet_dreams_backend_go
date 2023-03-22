@@ -45,12 +45,12 @@ services:
         property: database
    
 - type: redis
-    name: lightning
-    ipAllowList: # required
-      - source: 0.0.0.0/0
-        description: everywhere
-    plan: free # optional (defaults to starter)
-    maxmemoryPolicy: noeviction # optional (defaults to allkeys-lru)
+  name: lightning
+  ipAllowList: # required
+    - source: 0.0.0.0/0
+      description: everywhere
+  plan: free # optional (defaults to starter)
+  maxmemoryPolicy: noeviction # optional (defaults to allkeys-lru)
 
 databases:
   - name: sweet_dreams_go
