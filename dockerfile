@@ -13,7 +13,7 @@ FROM alpine:3.17 as RUNNER
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate ./migrate
-COPY db/migration ./migration
+COPY db/migrations ./migrations
 COPY start.sh .
 
 EXPOSE 3000
