@@ -7,6 +7,7 @@ import (
 
 	"github.com/gost-codes/sweet_dreams/api"
 	db "github.com/gost-codes/sweet_dreams/db/sqlc"
+	"github.com/gost-codes/sweet_dreams/docs"
 	"github.com/gost-codes/sweet_dreams/mail"
 	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/gost-codes/sweet_dreams/worker"
@@ -14,7 +15,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// @securityDefinitions.apikey bearerAuth
+// @in header
+// @name Authorization
+// @scheme Bearer
 func main() {
+
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("unable to load config:", err)
@@ -24,6 +30,13 @@ func main() {
 	if err != nil {
 		log.Fatal("unable to connect database:", err)
 	}
+
+	docs.SwaggerInfo.Title = "Sweet dreams - booking Api"
+	docs.SwaggerInfo.Description = "Personal project that helps in booking nurses for various nursing jobs"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = config.Host
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	store := db.NewStore(conn)
 	redisOpts := asynq.RedisClientOpt{

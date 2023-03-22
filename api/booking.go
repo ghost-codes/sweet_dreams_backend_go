@@ -11,6 +11,10 @@ import (
 	"github.com/gost-codes/sweet_dreams/token"
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 const (
 	MaternityNursing = "maternityNursing"
 	GiftPackage      = "giftPackage"
@@ -25,6 +29,16 @@ type createBookingReq struct {
 	Lat           float64   `json:"lat" binding:"required"`
 }
 
+// @Summary      create booking request for user
+// @Security 	  bearerAuth
+// @Description  get accounts
+// @Tags         Booking request
+// @Accept       json
+// @Produce      json
+// @Param        body    body     createBookingReq  true "create booking request by user"
+// @Success      200  {array}   db.Request
+// @Failure      400  {object}  ErrorResponse
+// @Router       /bookings/request [post]
 func (server *Server) createBooking(ctx *gin.Context) {
 	authUser := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 

@@ -22,6 +22,7 @@ type Config struct {
 	EmailSenderPassword  string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 	EmailSenderName      string        `mapstructure:"EMAIL_SENDER_NAME"`
 	RedisServerAddress   string        `mapstructure:"REDIS_SERVER_ADDRESS"`
+	Host                 string        `mapstructure:"HOST"`
 
 	// DBSource            string        `mapstructure:"DB_SOURCE"`
 }

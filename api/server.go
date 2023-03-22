@@ -12,6 +12,8 @@ import (
 	"github.com/gost-codes/sweet_dreams/token"
 	"github.com/gost-codes/sweet_dreams/util"
 	"github.com/gost-codes/sweet_dreams/worker"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -47,6 +49,8 @@ func NewServer(store db.Store, config util.Config, distributor worker.TaskDistri
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	if binder, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		binder.RegisterValidation("bookingType", validateBookingType)
